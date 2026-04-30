@@ -51,7 +51,7 @@ def get_exhibitions():
                     if not description:
                         description = item.get("intro", "暫無介紹")
                     
-                    # 清理 HTML 標籤（簡單處理）
+                    # 清理 HTML 標籤
                     if description:
                         description = description.replace("<br>", "\n")
                         description = description.replace("<br/>", "\n")
@@ -65,9 +65,12 @@ def get_exhibitions():
                     if showInfo and len(showInfo) > 0:
                         show_time = showInfo[0].get("time", "請洽主辦單位")
                         location_name = showInfo[0].get("locationName", "未提供")
+                        # 取得展覽地址
+                        address = showInfo[0].get("location", "未提供")
                     else:
                         show_time = "請洽主辦單位"
                         location_name = "未提供"
+                        address = "未提供"
                     
                     start_date = item.get("startDate", "")
                     end_date = item.get("endDate", "")
@@ -83,6 +86,7 @@ def get_exhibitions():
                         "時間": show_time,
                         "日期": date_range,
                         "地點": location_name,
+                        "地址": address,
                         "介紹": description if description else "暫無介紹"
                     })
                     
@@ -133,11 +137,11 @@ def main():
             if count > 15:
                 break
                 
-            message += f"🎨 <b>{ex['名稱']}</b>\n"
-            message += f"📍 展覽縣市：{ex['縣市']}\n"
-            message += f"📅 展覽日期：{ex['日期']}\n"
+            message += f"🎨 <b>展覽名稱：{ex['名稱']}</b>\n"
             message += f"🕐 展覽時間：{ex['時間']}\n"
+            message += f"📅 展覽日期：{ex['日期']}\n"
             message += f"📌 展覽地點：{ex['地點']}\n"
+            message += f"📍 展覽地址：{ex['地址']}\n"
             message += f"📖 展覽介紹：{ex['介紹']}\n"
             message += "\n" + "-" * 30 + "\n\n"
         
