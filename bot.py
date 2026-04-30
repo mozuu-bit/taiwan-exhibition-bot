@@ -46,6 +46,21 @@ def get_exhibitions():
                     location = item.get("location", "未提供")
                     title = item.get("title", "未提供")
                     
+                    # 取得展覽介紹
+                    description = item.get("descriptionFilterHtml", "")
+                    if not description:
+                        description = item.get("intro", "暫無介紹")
+                    
+                    # 清理 HTML 標籤（簡單處理）
+                    if description:
+                        description = description.replace("<br>", "\n")
+                        description = description.replace("<br/>", "\n")
+                        description = description.replace("<p>", "")
+                        description = description.replace("</p>", "\n")
+                        # 限制介紹長度
+                        if len(description) > 200:
+                            description = description[:200] + "..."
+                    
                     showInfo = item.get("showInfo", [])
                     if showInfo and len(showInfo) > 0:
                         show_time = showInfo[0].get("time", "請洽主辦單位")
@@ -63,11 +78,12 @@ def get_exhibitions():
                         date_range = "請洽主辦單位"
                     
                     exhibitions.append({
-                        "地區": location,
+                        "縣市": location,
                         "名稱": title,
                         "時間": show_time,
                         "日期": date_range,
-                        "地點": location_name
+                        "地點": location_name,
+                        "介紹": description if description else "暫無介紹"
                     })
                     
                 except Exception as e:
@@ -97,7 +113,7 @@ def main():
     
     by_region = {}
     for ex in exhibitions:
-        region = ex['地區']
+        region = ex['縣市']
         if region not in by_region:
             by_region[region] = []
         by_region[region].append(ex)
@@ -114,17 +130,18 @@ def main():
         
         for ex in exs[:5]:
             count += 1
-            if count > 20:
+            if count > 15:
                 break
                 
             message += f"🎨 <b>{ex['名稱']}</b>\n"
+            message += f"📍 展覽縣市：{ex['縣市']}\n"
             message += f"📅 展覽日期：{ex['日期']}\n"
             message += f"🕐 展覽時間：{ex['時間']}\n"
-            message += f"📌 展覽地點：{ex['地點']}\n\n"
+            message += f"📌 展覽地點：{ex['地點']}\n"
+            message += f"📖 展覽介紹：{ex['介紹']}\n"
+            message += "\n" + "-" * 30 + "\n\n"
         
-        message += "-" * 30 + "\n\n"
-        
-        if count > 20:
+        if count > 15:
             break
     
     max_length = 4000
